@@ -1,0 +1,1238 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>F1 Racing Game</title>
+    <style>
+    
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #000;
+    color: #fff;
+    overflow-x: hidden;
+}
+
+.container {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(180deg, #1a1a1a 0%, #000 100%);
+}
+
+/* Header */
+.header {
+    padding: 20px;
+    text-align: center;
+    border-bottom: 3px solid #ff0000;
+    background-color: #000;
+}
+
+.header h1 {
+    font-size: 2.5em;
+    letter-spacing: 3px;
+    color: #ff0000;
+    text-shadow: 2px 2px 0px #fff;
+    font-weight: bold;
+}
+
+/* Track Selector */
+.track-selector {
+    padding: 15px 20px;
+    background-color: #1a1a1a;
+    border-bottom: 2px solid #ff0000;
+}
+
+.track-selector h2 {
+    font-size: 0.9em;
+    letter-spacing: 2px;
+    color: #ff0000;
+    margin-bottom: 10px;
+}
+
+.track-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.track-btn {
+    padding: 8px 15px;
+    background-color: #333;
+    color: #fff;
+    border: 2px solid #fff;
+    cursor: pointer;
+    font-size: 0.85em;
+    letter-spacing: 1px;
+    font-weight: bold;
+    transition: all 0.2s;
+}
+
+.track-btn:hover {
+    background-color: #555;
+    transform: translate(0, -2px);
+}
+
+.track-btn.active {
+    background-color: #ff0000;
+    border-color: #ff0000;
+    color: #000;
+}
+
+/* Game Container */
+.game-container {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #000;
+    padding: 20px;
+    border-bottom: 2px solid #ff0000;
+    position: relative;
+    overflow: hidden;
+}
+
+canvas {
+    border: 3px solid #ff0000;
+    background-color: #0a0a0a;
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* Control Panel */
+.control-panel {
+    background-color: #1a1a1a;
+    padding: 20px;
+    border-top: 3px solid #ff0000;
+}
+
+.controls-section {
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+/* Info Display */
+.info-display {
+    display: flex;
+    gap: 30px;
+    margin-bottom: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.info-item {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.info-item .label {
+    color: #ff0000;
+    font-weight: bold;
+    font-size: 0.9em;
+    letter-spacing: 1px;
+}
+
+.info-item .value {
+    color: #fff;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9em;
+    min-width: 100px;
+}
+
+/* Keyboard Controls */
+.keyboard-controls {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+
+.control-row {
+    display: flex;
+    gap: 15px;
+}
+
+.key-hint {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+}
+
+.key {
+    background-color: #333;
+    border: 2px solid #fff;
+    color: #fff;
+    padding: 5px 10px;
+    font-weight: bold;
+    font-size: 0.85em;
+    letter-spacing: 1px;
+    min-width: 60px;
+    text-align: center;
+}
+
+.action {
+    font-size: 0.75em;
+    color: #ff0000;
+    letter-spacing: 1px;
+    font-weight: bold;
+}
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.btn {
+    padding: 10px 25px;
+    font-size: 0.9em;
+    letter-spacing: 2px;
+    font-weight: bold;
+    border: 2px solid;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+}
+
+.btn-start {
+    background-color: #ff0000;
+    color: #000;
+    border-color: #ff0000;
+}
+
+.btn-start:hover:not(:disabled) {
+    background-color: #cc0000;
+    transform: translate(0, -2px);
+}
+
+.btn-reset {
+    background-color: #333;
+    color: #fff;
+    border-color: #ff0000;
+}
+
+.btn-reset:hover:not(:disabled) {
+    background-color: #555;
+    transform: translate(0, -2px);
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Game Status */
+.game-status {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    border: 5px solid #ff0000;
+}
+
+.game-status.hidden {
+    display: none;
+}
+
+.status-content {
+    text-align: center;
+    border: 3px solid #ff0000;
+    padding: 40px;
+    background-color: #1a1a1a;
+}
+
+.status-content h2 {
+    font-size: 2em;
+    color: #ff0000;
+    margin-bottom: 20px;
+    letter-spacing: 2px;
+}
+
+.status-content p {
+    font-size: 1.2em;
+    color: #fff;
+    margin-bottom: 20px;
+    font-family: 'Courier New', monospace;
+}
+
+.status-content button {
+    margin-top: 20px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .header h1 {
+        font-size: 1.8em;
+    }
+
+    .track-buttons {
+        gap: 5px;
+    }
+
+    .track-btn {
+        padding: 6px 10px;
+        font-size: 0.75em;
+    }
+
+    .game-container {
+        padding: 10px;
+    }
+
+    canvas {
+        border-width: 2px;
+    }
+
+    .control-panel {
+        padding: 15px;
+    }
+
+    .info-display {
+        gap: 15px;
+        font-size: 0.9em;
+    }
+
+    .keyboard-controls {
+        gap: 10px;
+    }
+
+    .control-row {
+        gap: 10px;
+    }
+}
+
+/* Retro pixel-like feel */
+canvas {
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+}
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1>F1 RACING</h1>
+        </header>
+
+        <!-- Track Selection -->
+        <div class="track-selector">
+            <h2>SELECT TRACK</h2>
+            <div class="track-buttons">
+                <button class="track-btn" data-track="monaco">MONACO</button>
+                <button class="track-btn" data-track="silverstone">SILVERSTONE</button>
+                <button class="track-btn" data-track="monza">MONZA</button>
+                <button class="track-btn" data-track="spa">SPA</button>
+                <button class="track-btn active" data-track="circuit">CIRCUIT</button>
+                <button class="track-btn" data-track="suzuka">SUZUKA</button>
+            </div>
+        </div>
+
+        <!-- Game Area -->
+        <div class="game-container">
+            <canvas id="gameCanvas" width="1000" height="400"></canvas>
+        </div>
+
+        <!-- Control Panel -->
+        <div class="control-panel">
+            <div class="controls-section">
+                <div class="info-display">
+                    <div class="info-item">
+                        <span class="label">TRACK:</span>
+                        <span class="value" id="currentTrack">CIRCUIT</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">SPEED:</span>
+                        <span class="value" id="speedometer">0 KM/H</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">DISTANCE:</span>
+                        <span class="value" id="distanceometer">0 M</span>
+                    </div>
+                </div>
+
+                <div class="keyboard-controls">
+                    <div class="control-row">
+                        <div class="key-hint">
+                            <span class="key">↑ / W</span>
+                            <span class="action">ACCELERATE</span>
+                        </div>
+                        <div class="key-hint">
+                            <span class="key">↓ / S</span>
+                            <span class="action">BRAKE</span>
+                        </div>
+                        <div class="key-hint">
+                            <span class="key">R</span>
+                            <span class="action">REVERSE</span>
+                        </div>
+                    </div>
+                    <div class="control-row">
+                        <div class="key-hint">
+                            <span class="key">← / A</span>
+                            <span class="action">TURN LEFT</span>
+                        </div>
+                        <div class="key-hint">
+                            <span class="key">→ / D</span>
+                            <span class="action">TURN RIGHT</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button id="startBtn" class="btn btn-start">START</button>
+                    <button id="resetBtn" class="btn btn-reset">RESET</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Status -->
+        <div id="gameStatus" class="game-status hidden">
+            <div class="status-content">
+                <h2 id="statusMessage"></h2>
+                <p id="statusScore"></p>
+                <button id="restartBtn" class="btn btn-start" onclick="document.getElementById('resetBtn').click()">RESTART</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // F1 Racing Game
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+// Game States
+const GAME_STATE = {
+    IDLE: 'idle',
+    RUNNING: 'running',
+    CRASHED: 'crashed',
+    FINISHED: 'finished'
+};
+
+// Helper function to get hurdle lane position (0=left, 1=center, 2=right)
+function getHurdleLanePosition(hurdleDistance) {
+    const hurdleIndex = Math.floor((hurdleDistance - 1000) / 600);
+    return hurdleIndex % 3;
+}
+
+// Helper function to get hurdle Y position based on lane
+function getHurdleY(lanePosition, topBoundary, bottomBoundary) {
+    const roadHeight = bottomBoundary - topBoundary;
+    const roadCenter = (topBoundary + bottomBoundary) / 2;
+    
+    if (lanePosition === 0) return topBoundary + 25; // Left lane
+    if (lanePosition === 1) return roadCenter; // Center lane
+    if (lanePosition === 2) return bottomBoundary - 25; // Right lane
+}
+
+// Get road curve offset (Y shift) based on distance
+function getCurveOffset(distance) {
+    return Math.sin(distance * 0.002) * 60;
+}
+
+// Game Object
+const game = {
+    state: GAME_STATE.IDLE,
+    currentTrack: 'circuit',
+    frameCount: 0,
+    distance: 0,
+    speed: 0,
+    maxSpeed: 300,
+    acceleration: 0,
+    friction: 0.92,
+    raceStartTime: 0,
+    raceEndTime: 0,
+    bestTimes: {}
+};
+
+// Load best times from localStorage
+function loadBestTimes() {
+    const stored = localStorage.getItem('f1RacingBestTimes');
+    if (stored) {
+        game.bestTimes = JSON.parse(stored);
+    }
+}
+
+// Save best times to localStorage
+function saveBestTimes() {
+    localStorage.setItem('f1RacingBestTimes', JSON.stringify(game.bestTimes));
+}
+
+// Call on init
+loadBestTimes();
+
+// Car Object
+const car = {
+    x: 500,
+    y: 280,
+    width: 30,
+    height: 20,
+    velocityX: 0,
+    velocityY: 0,
+    acceleration: 0.5,
+    friction: 0.94,
+    maxSpeed: 15,
+    tilt: 0  // visual tilt only, replaces free rotation
+};
+
+// Input handling
+const keys = {
+    ArrowUp: false,
+    ArrowDown: false,
+    ArrowLeft: false,
+    ArrowRight: false,
+    w: false,
+    a: false,
+    s: false,
+    d: false,
+    r: false
+};
+
+// Track configurations
+const tracks = {
+    circuit: {
+        name: 'CIRCUIT',
+        color: '#333',
+        finish: 8000,
+        description: 'Basic Circuit'
+    },
+    monaco: {
+        name: 'MONACO',
+        color: '#444',
+        finish: 8000,
+        description: 'Narrow street circuit'
+    },
+    silverstone: {
+        name: 'SILVERSTONE',
+        color: '#333',
+        finish: 9000,
+        description: 'High speed track'
+    },
+    monza: {
+        name: 'MONZA',
+        color: '#222',
+        finish: 8500,
+        description: 'Fast Italian track'
+    },
+    spa: {
+        name: 'SPA',
+        color: '#444',
+        finish: 9200,
+        description: 'Challenging track'
+    },
+    suzuka: {
+        name: 'SUZUKA',
+        color: '#333',
+        finish: 8800,
+        description: 'Technical track'
+    }
+};
+
+// Event Listeners
+document.addEventListener('keydown', (e) => {
+    const key = e.key.toLowerCase();
+    if (key in keys) {
+        keys[key] = true;
+        e.preventDefault();
+    }
+    if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(key)) {
+        e.preventDefault();
+    }
+});
+
+document.addEventListener('keyup', (e) => {
+    const key = e.key.toLowerCase();
+    if (key in keys) {
+        keys[key] = false;
+    }
+});
+
+// Track button listeners
+document.querySelectorAll('.track-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.track-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        game.currentTrack = btn.dataset.track;
+        document.getElementById('currentTrack').textContent = tracks[game.currentTrack].name;
+        resetGame();
+    });
+});
+
+// Start button listener
+document.getElementById('startBtn').addEventListener('click', () => {
+    if (game.state === GAME_STATE.IDLE) {
+        game.state = GAME_STATE.RUNNING;
+        game.raceStartTime = Date.now();
+        document.getElementById('startBtn').disabled = true;
+    }
+});
+
+// Reset button listener
+document.getElementById('resetBtn').addEventListener('click', () => {
+    resetGame();
+});
+
+// Reset game
+function resetGame() {
+    game.state = GAME_STATE.IDLE;
+    game.distance = 0;
+    game.speed = 0;
+    car.x = 500;
+    car.y = 280;
+    car.velocityX = 0;
+    car.velocityY = 0;
+    car.tilt = 0;
+    game.frameCount = 0;
+    game.raceStartTime = 0;
+    document.getElementById('startBtn').disabled = false;
+    document.getElementById('gameStatus').classList.add('hidden');
+    // Reset status styles
+    document.getElementById('gameStatus').style.borderColor = '#ff0000';
+    document.getElementById('statusMessage').style.color = '#ff0000';
+}
+
+// Format seconds into M:SS.ss
+function formatTime(seconds) {
+    const mins = Math.floor(seconds / 60);
+    const secs = (seconds % 60).toFixed(2);
+    return `${mins}:${secs.padStart(5, '0')}`;
+}
+
+// Draw car — uses tilt (subtle lean) instead of free rotation
+function drawCar(x, y, tilt) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(tilt); // tilt is small, e.g. -0.15 to +0.15 radians
+
+    // Front wing (small nose cone)
+    ctx.fillStyle = '#ff0000';
+    ctx.beginPath();
+    ctx.moveTo(-car.width / 2, -car.height / 2);
+    ctx.lineTo(-car.width / 2 - 4, -car.height / 2 - 3);
+    ctx.lineTo(-car.width / 2 - 4, -car.height / 2 + 3);
+    ctx.closePath();
+    ctx.fill();
+
+    // Main car body
+    ctx.fillStyle = '#ff0000';
+    ctx.fillRect(-car.width / 2, -car.height / 2, car.width, car.height);
+
+    // Halo (cockpit protection)
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.arc(-2, -car.height / 2 + 4, 5, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // Cockpit/Driver area
+    ctx.fillStyle = '#000';
+    ctx.fillRect(-6, -car.height / 2 + 2, 12, 6);
+
+    // White racing stripe
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(-1, -car.height / 2, 2, car.height);
+
+    // Side pods
+    ctx.fillStyle = '#222';
+    ctx.fillRect(-car.width / 2 - 2, -car.height / 2 + 3, 2, 4);
+    ctx.fillRect(car.width / 2, -car.height / 2 + 3, 2, 4);
+
+    // Front wing details
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(-car.width / 2 - 5, -car.height / 2 - 2, 3, 1);
+    ctx.fillRect(-car.width / 2 - 5, car.height / 2 + 1, 3, 1);
+
+    // Rear wing (DRS-style)
+    ctx.fillStyle = '#ff0000';
+    ctx.fillRect(car.width / 2 - 2, -car.height / 2 - 3, 5, 2);
+    ctx.fillRect(car.width / 2 - 2, car.height / 2 + 1, 5, 2);
+
+    // Wheel outlines
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.arc(-car.width / 2 + 5, -car.height / 2 - 2, 2, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(-car.width / 2 + 5, car.height / 2 + 2, 2, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(car.width / 2 - 5, -car.height / 2 - 2, 2, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(car.width / 2 - 5, car.height / 2 + 2, 2, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // Team number
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 6px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('1', 0, -car.height / 2 + 6);
+
+    ctx.restore();
+}
+
+// Draw track with curves and obstacles
+function drawTrack() {
+    const track = tracks[game.currentTrack];
+
+    // Background
+    ctx.fillStyle = track.color;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Road width decreases with distance (harder as race progresses)
+    const roadWidthReduction = Math.min(game.distance / 8000, 0.4); // Max 40% reduction
+    const topBoundary = 120 + (roadWidthReduction * 40); // Narrows from top
+    const bottomBoundary = 380 - (roadWidthReduction * 40); // Narrows from bottom
+    const roadHeight = bottomBoundary - topBoundary;
+
+    // Apply road curve offset to create visually bending roads
+    const curveOffset = getCurveOffset(game.distance);
+    const shiftedTop = topBoundary + curveOffset;
+    const shiftedBottom = bottomBoundary + curveOffset;
+
+    // Road base with dynamic width and curve
+    ctx.fillStyle = '#222';
+    ctx.fillRect(0, shiftedTop, canvas.width, roadHeight);
+
+    // Draw curves
+    drawTrackCurves(game.currentTrack);
+
+    // Road lane markers with dynamic center position and curve
+    const roadCenter = (shiftedTop + shiftedBottom) / 2;
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([20, 20]);
+    const offset = (game.distance * 2) % 50;
+    for (let i = 0; i < canvas.width; i += 50) {
+        ctx.beginPath();
+        ctx.moveTo(i - offset, roadCenter);
+        ctx.lineTo(i - offset + 20, roadCenter);
+        ctx.stroke();
+    }
+    ctx.setLineDash([]);
+
+    // Road boundaries with dynamic width and curve
+    drawRoadBoundaries(shiftedTop, shiftedBottom);
+
+    // Draw F1-style hurdles (cones, barriers)
+    drawF1Hurdles(game.currentTrack);
+
+    // Obstacles
+    drawObstacles(game.currentTrack);
+
+    // Retro grid in sky area
+    ctx.strokeStyle = 'rgba(255, 0, 0, 0.1)';
+    ctx.lineWidth = 1;
+    for (let i = 0; i < canvas.width; i += 50) {
+        ctx.beginPath();
+        ctx.moveTo(i, 0);
+        ctx.lineTo(i, 120);
+        ctx.stroke();
+    }
+}
+
+// Draw track curves based on distance
+function drawTrackCurves(trackName) {
+    const distance = game.distance;
+    const segment = Math.floor(distance / 800) % 4;
+
+    ctx.fillStyle = 'rgba(255, 0, 0, 0.1)';
+
+    switch (trackName) {
+        case 'monaco':
+            if (segment % 2 === 0) {
+                ctx.fillRect(100, 120, 50, 260);
+            } else {
+                ctx.fillRect(canvas.width - 150, 120, 50, 260);
+            }
+            break;
+        case 'silverstone':
+            if (segment % 2 === 0) {
+                ctx.beginPath();
+                ctx.arc(canvas.width / 2, 120, 150, 0, Math.PI, true);
+                ctx.fill();
+            } else {
+                ctx.beginPath();
+                ctx.arc(canvas.width / 2, 380, 150, 0, Math.PI, false);
+                ctx.fill();
+            }
+            break;
+        case 'monza':
+            if (segment === 1 || segment === 3) {
+                ctx.fillRect(250, 120, 40, 260);
+                ctx.fillRect(canvas.width - 290, 120, 40, 260);
+            }
+            break;
+        case 'spa':
+            ctx.fillStyle = 'rgba(100, 100, 100, 0.2)';
+            if (segment % 2 === 0) {
+                ctx.fillRect(0, 140, canvas.width, 30);
+            }
+            break;
+        case 'suzuka':
+            if (segment % 3 === 0) {
+                ctx.beginPath();
+                ctx.ellipse(canvas.width / 2, 250, 100, 80, 0, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            break;
+    }
+}
+
+// Draw dynamic road boundaries with changing width
+function drawRoadBoundaries(topBoundary, bottomBoundary) {
+    ctx.strokeStyle = '#ff0000';
+    ctx.lineWidth = 3;
+
+    ctx.beginPath();
+    ctx.moveTo(0, topBoundary);
+    for (let i = 0; i <= canvas.width; i += 10) {
+        const y = topBoundary + Math.sin((i + game.distance) * 0.01) * 15;
+        ctx.lineTo(i, y);
+    }
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(0, bottomBoundary);
+    for (let i = 0; i <= canvas.width; i += 10) {
+        const y = bottomBoundary - Math.sin((i + game.distance) * 0.01) * 15;
+        ctx.lineTo(i, y);
+    }
+    ctx.stroke();
+}
+
+// Draw obstacles on track
+function drawObstacles(trackName) {
+    const distance = game.distance;
+    const obstacles = [];
+
+    if (trackName === 'circuit') {
+        obstacles.push({ dist: 1500, x: 250 }, { dist: 3500, x: 700 }, { dist: 5500, x: 300 });
+    } else if (trackName === 'monaco') {
+        obstacles.push({ dist: 800, x: 150 }, { dist: 2000, x: 750 }, { dist: 4000, x: 200 }, { dist: 6500, x: 800 });
+    } else if (trackName === 'silverstone') {
+        obstacles.push({ dist: 2000, x: 300 }, { dist: 4000, x: 650 }, { dist: 6000, x: 200 });
+    } else if (trackName === 'monza') {
+        obstacles.push({ dist: 1200, x: 350 }, { dist: 3000, x: 600 }, { dist: 5200, x: 250 });
+    } else if (trackName === 'spa') {
+        obstacles.push({ dist: 1800, x: 200 }, { dist: 3500, x: 700 }, { dist: 5500, x: 400 });
+    } else if (trackName === 'suzuka') {
+        obstacles.push({ dist: 1500, x: 300 }, { dist: 3200, x: 650 }, { dist: 5000, x: 250 });
+    }
+
+    obstacles.forEach(obs => {
+        if (Math.abs(distance - obs.dist) < 600) {
+            const visibility = 1 - Math.abs(distance - obs.dist) / 600;
+            const distAhead = obs.dist - distance;
+            const screenX = car.x + (distAhead / 800) * (canvas.width - car.x);
+            const screenY = 200 + Math.sin(distance * 0.003) * 30;
+
+            ctx.fillStyle = `rgba(51, 51, 51, ${visibility})`;
+            ctx.fillRect(screenX - 25, screenY - 20, 50, 40);
+
+            ctx.fillStyle = `rgba(255, 0, 0, ${visibility})`;
+            for (let i = 0; i < 50; i += 10) {
+                ctx.fillRect(screenX - 25 + i, screenY - 20, 5, 40);
+            }
+        }
+    });
+}
+
+// Draw F1-style hurdles - fixed position on specific road lane
+function drawF1Hurdles(trackName) {
+    const distance = game.distance;
+    const hurdles = [];
+
+    // Generate hurdles at fixed distances (600m spacing minimum, 1200m early game)
+    const startDist = 1000;
+    let hurdleDist = startDist;
+    const trackFinish = tracks[trackName].finish;
+    
+    while (hurdleDist < trackFinish) {
+        const hurdleIndex = Math.floor((hurdleDist - startDist) / 600);
+        const hurdleType = ['chicane', 'tires', 'cone-row'][hurdleIndex % 3];
+        const lanePosition = getHurdleLanePosition(hurdleDist);
+        hurdles.push({ dist: hurdleDist, type: hurdleType, lanePosition });
+        
+        // Use 600m spacing after 3000m, 1200m before
+        const spacing = hurdleDist >= 3000 ? 600 : 1200;
+        hurdleDist += spacing;
+    }
+
+    // Calculate dynamic road boundaries
+    const roadWidthReduction = Math.min(distance / 8000, 0.4);
+    const topBoundary = 120 + (roadWidthReduction * 40);
+    const bottomBoundary = 380 - (roadWidthReduction * 40);
+    const curveOffset = getCurveOffset(distance);
+    const shiftedTop = topBoundary + curveOffset;
+    const shiftedBottom = bottomBoundary + curveOffset;
+
+    // Draw hurdles at FIXED lane positions
+    hurdles.forEach(hurdle => {
+        const distAhead = hurdle.dist - distance;
+        // Show hurdles from 800m ahead until they fade out
+        if (distAhead > -200 && distAhead < 800) {
+            // Get fixed Y position for this hurdle's lane
+            const screenY = getHurdleY(hurdle.lanePosition, shiftedTop, shiftedBottom);
+            const screenX = car.x + (distAhead / 800) * (canvas.width - car.x);
+            // Fade in as approaching, fade out after passing
+            const visibility = distAhead > 0 ? 1 : Math.max(0, 1 + distAhead / 200);
+
+            if (hurdle.type === 'cone-row') {
+                // Wide traffic cones blocking road
+                for (let i = 0; i < 5; i++) {
+                    const coneX = screenX - 40 + i * 20;
+                    ctx.fillStyle = `rgba(255, 165, 0, ${visibility})`; // Orange
+                    ctx.beginPath();
+                    ctx.moveTo(coneX, screenY - 12);
+                    ctx.lineTo(coneX - 7, screenY + 8);
+                    ctx.lineTo(coneX + 7, screenY + 8);
+                    ctx.closePath();
+                    ctx.fill();
+                    // Cone stripe
+                    ctx.strokeStyle = `rgba(255, 255, 255, ${visibility})`;
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.moveTo(coneX, screenY - 8);
+                    ctx.lineTo(coneX, screenY + 4);
+                    ctx.stroke();
+                }
+            } else if (hurdle.type === 'tires') {
+                // Large tire stack blocking most of road
+                ctx.fillStyle = `rgba(0, 0, 0, ${visibility * 0.85})`;
+                for (let row = 0; row < 3; row++) {
+                    for (let col = 0; col < 3; col++) {
+                        const tireX = screenX - 30 + col * 20;
+                        const tireY = screenY - 30 + row * 20;
+                        ctx.beginPath();
+                        ctx.arc(tireX, tireY, 10, 0, Math.PI * 2);
+                        ctx.fill();
+                        // Tire detail
+                        ctx.strokeStyle = `rgba(100, 100, 100, ${visibility})`;
+                        ctx.lineWidth = 2;
+                        ctx.stroke();
+                    }
+                }
+            } else if (hurdle.type === 'chicane') {
+                // Large chicane barriers blocking road
+                ctx.fillStyle = `rgba(200, 0, 0, ${visibility * 0.85})`;
+                ctx.fillRect(screenX - 50, screenY - 25, 15, 50);
+                ctx.fillRect(screenX + 35, screenY - 25, 15, 50);
+                // White stripes
+                ctx.fillStyle = `rgba(255, 255, 255, ${visibility})`;
+                for (let i = 0; i < 4; i++) {
+                    ctx.fillRect(screenX - 49, screenY - 23 + i * 12, 13, 5);
+                    ctx.fillRect(screenX + 36, screenY - 23 + i * 12, 13, 5);
+                }
+            }
+        }
+    });
+}
+
+// Update car physics
+function updateCar() {
+    const moveUp    = keys.arrowup    || keys.w;
+    const moveDown  = keys.arrowdown  || keys.s;
+    const moveLeft  = keys.arrowleft  || keys.a;
+    const moveRight = keys.arrowright || keys.d;
+    const moveReverse = keys.r;
+
+    // Acceleration (forward)
+    if (moveUp) {
+        game.speed += 0.4;
+        if (game.speed > car.maxSpeed) game.speed = car.maxSpeed;
+    } else if (!moveReverse) {
+        // Natural deceleration
+        game.speed *= 0.96;
+        if (Math.abs(game.speed) < 0.1) game.speed = 0;
+    }
+
+    // Braking
+    if (moveDown) {
+        game.speed *= 0.88;
+        if (Math.abs(game.speed) < 0.1) game.speed = 0;
+    }
+
+    // Reverse
+    if (moveReverse) {
+        game.speed -= 0.3;
+        if (game.speed < -(car.maxSpeed / 2)) game.speed = -(car.maxSpeed / 2);
+    }
+
+    // Lane movement — left/right keys move the car up/down on the canvas
+    // (the road scrolls horizontally, so Y = position across the road)
+    // Scale lateral speed with how fast the car is going
+    const speedFactor = Math.abs(game.speed) / car.maxSpeed;
+    const lateralSpeed = 1.5 + speedFactor * 3.5; // 1.5 at rest, up to 5 at full speed
+
+    let newY = car.y;
+    if (moveLeft) {
+        // Moving forward: left = up on canvas (lower Y). Reverse: left = down on canvas.
+        newY += (game.speed >= 0 ? -1 : 1) * lateralSpeed;
+        car.tilt = game.speed >= 0 ? -0.18 : 0.18;
+    } else if (moveRight) {
+        newY += (game.speed >= 0 ? 1 : -1) * lateralSpeed;
+        car.tilt = game.speed >= 0 ? 0.18 : -0.18;
+    } else {
+        car.tilt *= 0.75;
+        if (Math.abs(car.tilt) < 0.01) car.tilt = 0;
+    }
+
+    // Calculate dynamic road boundaries with curve offset (same as drawTrack)
+    const roadWidthReduction = Math.min(game.distance / 8000, 0.4);
+    const topBoundary = 120 + (roadWidthReduction * 40);
+    const bottomBoundary = 380 - (roadWidthReduction * 40);
+    const curveOffset = getCurveOffset(game.distance);
+    const shiftedTop = topBoundary + curveOffset;
+    const shiftedBottom = bottomBoundary + curveOffset;
+
+    // Check for wall collision BEFORE clamping
+    if (newY < shiftedTop || newY > shiftedBottom) {
+        game.state = GAME_STATE.CRASHED;
+        endGame('WALL COLLISION', `Distance: ${Math.floor(game.distance)} M`);
+        return;
+    }
+
+    // Update car Y only if collision check passed
+    car.y = newY;
+
+    // Clamp car within road boundaries
+    if (car.y < shiftedTop) car.y = shiftedTop;
+    if (car.y > shiftedBottom) car.y = shiftedBottom;
+
+    // Advance or retreat distance based on speed
+    game.distance += game.speed / 10;
+    if (game.distance < 0) game.distance = 0;
+}
+
+// Check collisions
+function checkCollisions() {
+    const distance = game.distance;
+    const trackName = game.currentTrack;
+    let crashed = false;
+
+    const collisionZones = {
+        circuit: [
+            { dist: 1500, x: 250, width: 50 },
+            { dist: 3500, x: 700, width: 50 },
+            { dist: 5500, x: 300, width: 50 }
+        ],
+        monaco: [
+            { dist: 800,  x: 150, width: 50 },
+            { dist: 2000, x: 750, width: 50 },
+            { dist: 4000, x: 200, width: 50 },
+            { dist: 6500, x: 800, width: 50 }
+        ],
+        silverstone: [
+            { dist: 2000, x: 300, width: 50 },
+            { dist: 4000, x: 650, width: 50 },
+            { dist: 6000, x: 200, width: 50 }
+        ],
+        monza: [
+            { dist: 1200, x: 350, width: 50 },
+            { dist: 3000, x: 600, width: 50 },
+            { dist: 5200, x: 250, width: 50 }
+        ],
+        spa: [
+            { dist: 1800, x: 200, width: 50 },
+            { dist: 3500, x: 700, width: 50 },
+            { dist: 5500, x: 400, width: 50 }
+        ],
+        suzuka: [
+            { dist: 1500, x: 300, width: 50 },
+            { dist: 3200, x: 650, width: 50 },
+            { dist: 5000, x: 250, width: 50 }
+        ]
+    };
+
+    if (collisionZones[trackName]) {
+        collisionZones[trackName].forEach(zone => {
+            if (Math.abs(distance - zone.dist) < 300) {
+                if (car.x > zone.x - zone.width && car.x < zone.x + zone.width) {
+                    crashed = true;
+                }
+            }
+        });
+    }
+
+    // Calculate dynamic road boundaries for hurdle collision check with curve offset
+    const roadWidthReduction = Math.min(distance / 8000, 0.4);
+    const topBoundary = 120 + (roadWidthReduction * 40);
+    const bottomBoundary = 380 - (roadWidthReduction * 40);
+    const curveOffset = getCurveOffset(distance);
+    const shiftedTop = topBoundary + curveOffset;
+    const shiftedBottom = bottomBoundary + curveOffset;
+
+    // Check for hurdle collisions (lane-based)
+    const startDist = 1000;
+    let hurdleDist = startDist;
+    const trackFinish = tracks[trackName].finish;
+    let hurdleCollided = false;
+    while (hurdleDist < trackFinish && !crashed) {
+        const distToHurdle = Math.abs(distance - hurdleDist);
+        // Car is approaching or at a hurdle - check if in same lane
+        const hurdleIndex = Math.floor((hurdleDist - startDist) / 600);
+        const hurdleType = ['chicane', 'tires', 'cone-row'][hurdleIndex % 3];
+        const lanePosition = getHurdleLanePosition(hurdleDist);
+        const hurdleY = getHurdleY(lanePosition, shiftedTop, shiftedBottom);
+        
+        // Collision if hurdle is within 50 distance units AND within 30px vertically
+        if (distToHurdle < 50 && Math.abs(car.y - hurdleY) < 30) {
+            crashed = true;
+            hurdleCollided = true;
+            break;
+        }
+        
+        // Advance to next hurdle
+        const spacing = hurdleDist >= 3000 ? 600 : 1200;
+        hurdleDist += spacing;
+    }
+
+    if (crashed) {
+        game.state = GAME_STATE.CRASHED;
+        const message = hurdleCollided ? 'HURDLE HIT' : 'WALL COLLISION';
+        endGame(message, `Distance: ${Math.floor(game.distance)} M`);
+        return;
+    }
+
+    if (game.distance >= tracks[game.currentTrack].finish) {
+        game.state = GAME_STATE.FINISHED;
+        endGame('FINISHED!', '');
+    }
+}
+
+// End game — handles timing and best time celebration
+function endGame(message, score) {
+    const track = game.currentTrack;
+
+    document.getElementById('statusMessage').textContent = message;
+
+    if (game.state === GAME_STATE.FINISHED) {
+        const elapsed = (Date.now() - game.raceStartTime) / 1000;
+        const timeStr = formatTime(elapsed);
+
+        if (!game.bestTimes[track] || elapsed < game.bestTimes[track]) {
+            // New best time!
+            game.bestTimes[track] = elapsed;
+            saveBestTimes();
+            document.getElementById('statusScore').textContent = `🏆 NEW BEST: ${timeStr}`;
+            document.getElementById('gameStatus').style.borderColor = '#ffd700';
+            document.getElementById('statusMessage').style.color = '#ffd700';
+        } else {
+            const bestStr = formatTime(game.bestTimes[track]);
+            document.getElementById('statusScore').textContent =
+                `YOUR TIME: ${timeStr}  |  BEST: ${bestStr}`;
+            document.getElementById('gameStatus').style.borderColor = '#ff0000';
+            document.getElementById('statusMessage').style.color = '#ff0000';
+        }
+    } else {
+        document.getElementById('statusScore').textContent = score;
+        document.getElementById('gameStatus').style.borderColor = '#ff0000';
+        document.getElementById('statusMessage').style.color = '#ff0000';
+    }
+
+    document.getElementById('gameStatus').classList.remove('hidden');
+    document.getElementById('startBtn').disabled = false;
+}
+
+// Draw HUD (on-canvas info)
+function drawHUD() {
+    const speedValue = Math.floor(Math.abs(game.speed) * 20);
+    ctx.fillStyle = '#fff';
+    ctx.font = '16px Arial';
+    ctx.textAlign = 'left';
+    ctx.fillText(`SPD: ${speedValue} KM/H`, 20, 30);
+    ctx.fillText(`DIST: ${Math.floor(game.distance)} M`, 20, 55);
+
+    // Live race timer on canvas
+    if (game.state === GAME_STATE.RUNNING && game.raceStartTime > 0) {
+        const elapsed = (Date.now() - game.raceStartTime) / 1000;
+        ctx.fillStyle = '#ffd700';
+        ctx.font = 'bold 14px Arial';
+        ctx.fillText(`TIME: ${formatTime(elapsed)}`, 20, 80);
+    }
+
+    // Best time for current track
+    if (game.bestTimes[game.currentTrack]) {
+        ctx.fillStyle = '#ffd700';
+        ctx.font = '13px Arial';
+        ctx.fillText(`BEST: ${formatTime(game.bestTimes[game.currentTrack])}`, 20, 100);
+    }
+
+    ctx.fillStyle = '#ff0000';
+    ctx.font = 'bold 16px Arial';
+    ctx.textAlign = 'left';
+    ctx.fillText(tracks[game.currentTrack].name, canvas.width - 200, 30);
+
+    if (game.distance >= tracks[game.currentTrack].finish * 0.8) {
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+        ctx.font = 'bold 14px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('FINISH LINE AHEAD', canvas.width / 2, 30);
+    }
+
+    // Reverse indicator
+    if (game.speed < 0) {
+        ctx.fillStyle = '#ff4444';
+        ctx.font = 'bold 14px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('◄ REVERSE', canvas.width / 2, 55);
+    }
+
+    ctx.textAlign = 'left';
+}
+
+// Update UI panel
+function updateUI() {
+    document.getElementById('speedometer').textContent =
+        `${Math.floor(Math.abs(game.speed) * 20)} KM/H${game.speed < 0 ? ' (REV)' : ''}`;
+    document.getElementById('distanceometer').textContent = `${Math.floor(game.distance)} M`;
+}
+
+// Game loop
+function gameLoop() {
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    drawTrack();
+
+    if (game.state === GAME_STATE.RUNNING) {
+        updateCar();
+        checkCollisions();
+        game.frameCount++;
+    }
+
+    drawCar(car.x, car.y, car.tilt);
+    drawHUD();
+    updateUI();
+
+    requestAnimationFrame(gameLoop);
+}
+
+// Start
+gameLoop();
+document.getElementById('currentTrack').textContent = tracks[game.currentTrack].name; 
+
+    </script>
+</body>
+</html>
