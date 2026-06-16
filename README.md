@@ -6,7 +6,7 @@ A single-file browser game built with HTML5 Canvas during an internship. No fram
 
 ## How to Play
 
-Open `https://thatshedesigner.github.io/F1-Game/` in any modern browser. Pick a track, hit **START**, and drive.
+[Play the game](https://thatshedesigner.github.io/F1-Game/) in any modern browser. Pick a track, hit **START**, and drive.
 
 The goal is to reach the finish line without hitting the walls, obstacles, or hurdles. The road narrows as you go, so what starts out comfortable gets tight by the end.
 
