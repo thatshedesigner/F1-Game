@@ -6,7 +6,7 @@ A single-file browser game built with HTML5 Canvas during an internship. No fram
 
 ## How to Play
 
-Open `f1racing-PS.html` in any modern browser. Pick a track, hit **START**, and drive.
+Open `https://thatshedesigner.github.io/F1-Game/` in any modern browser. Pick a track, hit **START**, and drive.
 
 The goal is to reach the finish line without hitting the walls, obstacles, or hurdles. The road narrows as you go, so what starts out comfortable gets tight by the end.
 
@@ -92,7 +92,7 @@ Finishing a track records your time. Best times are saved in `localStorage` per 
 
 ## File Structure
 
-Everything is in one file: `f1racing-PS.html`
+Everything is in one file: `index.html`
 
 - Styles (reset, layout, canvas, control panel, game status overlay)
 - HTML (header, track selector, canvas, control panel, status overlay)
